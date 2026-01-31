@@ -1,54 +1,73 @@
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Registrar Nuevo Videojuego</h4>
-            </div>
-            <div class="card-body">
-                <form action="/juegos/guardar" method="POST">
-                    
-                    <div class="mb-3">
-                        <label for="titulo" class="form-label">Título del Juego</label>
-                        <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Ej: The Legend of Zelda" required>
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+        <%= title %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h3 class="mb-0">
+                            <%= juego ? 'Editar Videojuego' : 'Nuevo Videojuego' %>
+                        </h3>
                     </div>
+                    <div class="card-body">
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="plataforma" class="form-label">Plataforma</label>
-                            <select class="form-select" id="plataforma" name="plataforma" required>
-                                <option value="" disabled selected>Selecciona...</option>
-                                <option value="PC">PC</option>
-                                <option value="PlayStation 5">PlayStation 5</option>
-                                <option value="PlayStation 4">PlayStation 4</option>
-                                <option value="Xbox Series">Xbox Series</option>
-                                <option value="Nintendo Switch">Nintendo Switch</option>
-                                <option value="Retro">Retro / Otros</option>
-                            </select>
-                        </div>
+                        <form action="<%= juego ? '/juegos/editar/' + juego.id : '/juegos/guardar' %>" method="POST">
 
-                        <div class="col-md-6 mb-3">
-                            <label for="genero" class="form-label">Género</label>
-                            <input type="text" class="form-control" id="genero" name="genero" placeholder="Ej: RPG, Acción...">
-                        </div>
+                            <div class="mb-3">
+                                <label for="titulo" class="form-label">Título</label>
+                                <input type="text" class="form-control" id="titulo" name="titulo"
+                                    value="<%= juego ? juego.titulo : '' %>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="plataforma" class="form-label">Plataforma</label>
+                                <input type="text" class="form-control" id="plataforma" name="plataforma"
+                                    value="<%= juego ? juego.plataforma : '' %>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="genero" class="form-label">Género</label>
+                                <input type="text" class="form-control" id="genero" name="genero"
+                                    value="<%= juego ? juego.genero : '' %>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="estado" class="form-label">Estado</label>
+                                <select class="form-select" id="estado" name="estado">
+                                    <option value="pendiente" <%=(juego && juego.estado==='pendiente' ) ? 'selected'
+                                        : '' %>>Pendiente</option>
+                                    <option value="jugando" <%=(juego && juego.estado==='jugando' ) ? 'selected' : '' %>
+                                        >Jugando</option>
+                                    <option value="completado" <%=(juego && juego.estado==='completado' ) ? 'selected'
+                                        : '' %>>Completado</option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <%= juego ? 'Actualizar Cambios' : 'Guardar Juego' %>
+                                </button>
+                                <a href="/dashboard" class="btn btn-secondary">Cancelar</a>
+                            </div>
+
+                        </form>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="estado" class="form-label">Estado actual</label>
-                        <select class="form-select" id="estado" name="estado">
-                            <option value="pendiente">Pendiente (Backlog)</option>
-                            <option value="jugando">Jugando actualmente</option>
-                            <option value="completado">Completado</option>
-                        </select>
-                    </div>
-
-                    <hr>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">Guardar Videojuego</button>
-                        <a href="/dashboard" class="btn btn-secondary">Cancelar</a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+</body>
+
+</html>
