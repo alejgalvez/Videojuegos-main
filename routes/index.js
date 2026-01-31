@@ -35,18 +35,35 @@ router.get('/registro', (req, res) => {
 router.post('/registro', (req, res) => {
     const { username, password } = req.body;
     try {
+        // 1. Validar que no falten datos
         if(!username || !password) throw new Error("Faltan datos");
+
+        // 2. Validar formato de correo
+        if (!username.includes('@') || !username.includes('.')) {
+            throw new Error("Por favor, introduce un correo electrónico válido");
+        }
+
+        // 3. Validar longitud de contraseña
+        if (password.length < 6) {
+            throw new Error("La contraseña debe tener al menos 6 caracteres");
+        }
+
         UsuarioDAO.crear(username, password);
         res.redirect('/?mensaje=registrado');
     } catch (err) {
+        // Si falla alguna validación, recargamos la página mostrando el error
         res.render('registro', { title: 'Crear Cuenta', error: err.message });
     }
 });
 
 // 5. Cerrar Sesión
 router.get('/logout', (req, res) => {
-    req.session = null;
-    res.redirect('/');
+    req.session.destroy((err) => {
+        if (err) {
+            console.log("Error al cerrar sesión:", err);
+        }
+        res.redirect('/');
+    });
 });
 
 // 6. Dashboard 
