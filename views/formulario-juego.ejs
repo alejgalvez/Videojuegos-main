@@ -32,8 +32,16 @@
 
                             <div class="mb-3">
                                 <label for="plataforma" class="form-label">Plataforma</label>
-                                <input type="text" class="form-control" id="plataforma" name="plataforma"
-                                    value="<%= juego ? juego.plataforma : '' %>" required>
+                                <select class="form-select" id="plataforma" name="plataforma" required>
+                                    <option value="">-- Selecciona una plataforma --</option>
+                                    <option value="PC" <%= (juego && juego.plataforma === 'PC') ? 'selected' : '' %>>PC</option>
+                                    <option value="PlayStation 3" <%= (juego && juego.plataforma === 'PlayStation 3') ? 'selected' : '' %>>PlayStation 3</option>
+                                    <option value="PlayStation 4" <%= (juego && juego.plataforma === 'PlayStation 4') ? 'selected' : '' %>>PlayStation 4</option>
+                                    <option value="PlayStation 5" <%= (juego && juego.plataforma === 'PlayStation 5') ? 'selected' : '' %>>PlayStation 5</option>
+                                    <option value="Xbox One" <%= (juego && juego.plataforma === 'Xbox One') ? 'selected' : '' %>>Xbox One</option>
+                                    <option value="Xbox Series X|S" <%= (juego && juego.plataforma === 'Xbox Series X|S') ? 'selected' : '' %>>Xbox Series X|S</option>
+                                    <option value="Nintendo Switch" <%= (juego && juego.plataforma === 'Nintendo Switch') ? 'selected' : '' %>>Nintendo Switch</option>
+                                </select>
                             </div>
 
                             <div class="mb-3">

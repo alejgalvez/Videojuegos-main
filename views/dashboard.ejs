@@ -1,8 +1,20 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Mi Colección</h1>
-    <a href="/juegos/nuevo" class="btn btn-success">
-        <i class="bi bi-plus-circle"></i> + Nuevo Juego
-    </a>
+
+    <div class="d-flex align-items-center gap-3">
+        <div class="btn-group" role="group" aria-label="Filtro favoritos">
+            <button type="button" class="btn btn-outline-secondary active" id="btnFiltroTodos">
+                <i class="bi bi-folder-fill me-1"></i> Todos
+            </button>
+            <button type="button" class="btn btn-outline-secondary" id="btnFiltroSoloFav">
+                <i class="bi bi-star text-warning me-1"></i> Solo favoritos
+            </button>
+        </div>
+
+        <a href="/juegos/nuevo" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> + Nuevo Juego
+        </a>
+    </div>
 </div>
 
 <div class="card shadow-sm">
@@ -15,6 +27,7 @@
                         <th>Plataforma</th>
                         <th>Género</th>
                         <th>Estado</th>
+                        <th class="text-center">Fav</th>
                         <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
@@ -28,7 +41,9 @@
                         </tr>
                     <% } else { %>
                         <% juegos.forEach(juego => { %>
-                            <tr>
+                            <tr class="fila-juego"
+                                data-juego-id="<%= juego.id %>"
+                                data-juego-titulo="<%= juego.titulo %>">
                                 <td class="fw-bold"><%= juego.titulo %></td>
                                 <td><%= juego.plataforma %></td>
                                 <td><%= juego.genero %></td>
@@ -42,6 +57,13 @@
                                     <span class="badge <%= badgeClass %> rounded-pill">
                                         <%= juego.estado.toUpperCase() %>
                                     </span>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-link btn-sm btn-favorito"
+                                            title="Marcar como favorito">
+                                        <i class="bi bi-star text-secondary icono-favorito"></i>
+                                    </button>
                                 </td>
                                 <td class="text-end">
                                     <a href="/juegos/editar/<%= juego.id %>" class="btn btn-sm btn-warning me-2">
@@ -62,3 +84,110 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Gestión de favoritos con localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const LS_KEY = 'juegosFavoritos';
+        const filasJuego = Array.from(document.querySelectorAll('.fila-juego'));
+        const btnFiltroTodos = document.getElementById('btnFiltroTodos');
+        const btnFiltroSoloFav = document.getElementById('btnFiltroSoloFav');
+
+        function cargarFavoritos() {
+            try {
+                const data = JSON.parse(localStorage.getItem(LS_KEY));
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function guardarFavoritos(favoritos) {
+            localStorage.setItem(LS_KEY, JSON.stringify(favoritos));
+        }
+
+        function renderizarIconos(favoritos) {
+            filasJuego.forEach(fila => {
+                const id = fila.dataset.juegoId;
+                const esFavorito = favoritos.includes(id);
+                const icono = fila.querySelector('.icono-favorito');
+
+                if (!icono) return;
+
+                if (esFavorito) {
+                    icono.classList.remove('bi-star', 'text-secondary');
+                    icono.classList.add('bi-star-fill', 'text-warning');
+                } else {
+                    icono.classList.remove('bi-star-fill', 'text-warning');
+                    icono.classList.add('bi-star', 'text-secondary');
+                }
+            });
+        }
+
+        function aplicarFiltroTabla(favoritos, soloFavoritos) {
+            filasJuego.forEach(fila => {
+                const id = fila.dataset.juegoId;
+                const esFav = favoritos.includes(id);
+                if (soloFavoritos && !esFav) {
+                    fila.classList.add('d-none');
+                } else {
+                    fila.classList.remove('d-none');
+                }
+            });
+        }
+
+        function actualizarBotonesFiltro(soloFavoritos) {
+            if (!btnFiltroTodos || !btnFiltroSoloFav) return;
+            if (soloFavoritos) {
+                btnFiltroSoloFav.classList.add('active');
+                btnFiltroTodos.classList.remove('active');
+            } else {
+                btnFiltroTodos.classList.add('active');
+                btnFiltroSoloFav.classList.remove('active');
+            }
+        }
+
+        // Estado inicial
+        let favoritos = cargarFavoritos();
+        let soloFavoritos = false;
+        renderizarIconos(favoritos);
+        aplicarFiltroTabla(favoritos, soloFavoritos);
+        actualizarBotonesFiltro(soloFavoritos);
+
+        // Click en estrella
+        filasJuego.forEach(fila => {
+            const btn = fila.querySelector('.btn-favorito');
+            if (!btn) return;
+
+            btn.addEventListener('click', () => {
+                const id = fila.dataset.juegoId;
+                if (!id) return;
+
+                if (favoritos.includes(id)) {
+                    favoritos = favoritos.filter(f => f !== id);
+                } else {
+                    favoritos.push(id);
+                }
+
+                guardarFavoritos(favoritos);
+                renderizarIconos(favoritos);
+                aplicarFiltroTabla(favoritos, soloFavoritos);
+            });
+        });
+
+        // Botones de filtro "Todos" / "Solo favoritos"
+        if (btnFiltroTodos && btnFiltroSoloFav) {
+            btnFiltroTodos.addEventListener('click', () => {
+                soloFavoritos = false;
+                actualizarBotonesFiltro(soloFavoritos);
+                aplicarFiltroTabla(favoritos, soloFavoritos);
+            });
+
+            btnFiltroSoloFav.addEventListener('click', () => {
+                soloFavoritos = true;
+                actualizarBotonesFiltro(soloFavoritos);
+                aplicarFiltroTabla(favoritos, soloFavoritos);
+            });
+        }
+    });
+</script>
